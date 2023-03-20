@@ -35,13 +35,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>2023-12</td>
-            <td>1</td>
-        </tr>
-        <tr>
-            <td>2023-11</td>
-            <td>2</td>
+        <tr th:each="forecast : ${IndexModel.forecasts}">
+            <td th:text="${forecast.date}"></td>
+            <td th:text="${forecast.temperature}"></td>
         </tr>
         </tbody>
     </table>
