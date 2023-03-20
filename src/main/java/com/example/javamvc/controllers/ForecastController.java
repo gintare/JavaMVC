@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
@@ -22,35 +23,46 @@ import java.util.Scanner;
 public class ForecastController {
 
     @GetMapping("/")
-    public ModelAndView index() throws IOException {
+    public ModelAndView index(@RequestParam(required = false) String cityCode) throws IOException {
         var modelAndView = new ModelAndView("index");
+        if(cityCode == ""){
+            cityCode = null;
+        }
 
         var indexModel = new IndexModel();
 
-        ArrayList<String> cities = getCities();
+        ArrayList<Place> cities = getCities();
         indexModel.cities = cities;
 
-        ArrayList<ForecastModel> forecats = getForecasts(indexModel);
-        indexModel.forecasts = forecats;
+        if (cityCode != null) {
+                ArrayList<ForecastModel> forecats = getForecasts(cityCode);
+                indexModel.forecasts = forecats;
+        }
+
+        indexModel.currentCity = cityCode;
+
 
         modelAndView.addObject("IndexModel", indexModel);
         return  modelAndView;
     }
 
-    private static ArrayList<String> getCities() throws IOException {
-        var cities = new ArrayList<String>();
+    private static ArrayList<Place> getCities() throws IOException {
+        var cities = new ArrayList<Place>();
         String json = loadCitiesDataJson();
         ObjectMapper om = new ObjectMapper();
         Place[] obj = om.readValue(json, Place[].class);
         for(var o : obj){
-            cities.add(o.name);
+            var place = new Place();
+            place.code = o.code;
+            place.name = o.name;
+            cities.add(place);
         }
 
         return cities;
     }
 
-    private static ArrayList<ForecastModel> getForecasts(IndexModel indexModel) throws IOException {
-        String forecatsJson = loadDataJson("https://api.meteo.lt/v1/places/vilnius/forecasts/long-term");
+    private static ArrayList<ForecastModel> getForecasts(String city) throws IOException {
+        String forecatsJson = loadDataJson("https://api.meteo.lt/v1/places/"+city+"/forecasts/long-term");
         Root root = getObjectFromJson(forecatsJson);
 
         var forecats = new ArrayList<ForecastModel>();
