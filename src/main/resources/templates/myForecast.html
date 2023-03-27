@@ -5,6 +5,9 @@
     <title>Title</title>
 </head>
 <body>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
 <ul th:each="forecast : ${myForecasts}">
     <li>
         <span th:text="${forecast.date}"></span>
