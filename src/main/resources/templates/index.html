@@ -25,6 +25,10 @@
 <form th:action="@{/logout}" method="post">
     <input type="submit" value="Sign Out"/>
 </form>
+<div>
+    <span>Labas,</span>
+    <span th:text="${IndexModel.userName}"></span>
+</div>
 
 <div class="forecast-block container">
 
